@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FruitVision AI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="theme-color" content="#10b981">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>FruitVision AI</h1>
+            <p>Upload or capture an image of a fruit and let our AI identify it</p>
+        </header>
+
+        <main>
+            <div class="card" id="upload-card">
+                <div class="image-container" id="image-preview">
+                    <div class="upload-placeholder" id="upload-placeholder">
+                        <div class="upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>Upload a fruit image</h3>
+                        <p>Take a photo or upload an image of a fruit</p>
+                    </div>
+                    <img id="preview-image" class="hidden" alt="Uploaded fruit">
+                    <video id="camera-feed" class="hidden" autoplay playsinline></video>
+                    <button id="capture-button" class="button primary hidden">Capture</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="upload-button" class="button outline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Upload
+                    </button>
+                    <button id="camera-button" class="button outline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        Camera
+                    </button>
+                </div>
+
+                <button id="recognize-button" class="button primary hidden">Recognize Fruit</button>
+                <div id="error-message" class="error-message hidden"></div>
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+
+            <div class="card hidden" id="result-card">
+                <div class="result-header">
+                    <button id="back-button" class="button text">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        Back to upload
+                    </button>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-image-container">
+                        <img id="result-image" alt="Fruit image">
+                    </div>
+
+                    <div class="result-info">
+                        <div class="fruit-header">
+                            <h2 id="fruit-name">Loading...</h2>
+                            <p id="scientific-name" class="scientific-name"></p>
+                        </div>
+                        <p id="fruit-description" class="fruit-description"></p>
+
+                        <div class="tabs">
+                            <div class="tab-list">
+                                <button class="tab active" data-tab="nutrition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 2v1a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"></path>
+                                        <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+                                        <path d="M20 14a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z"></path>
+                                        <path d="m7 22 3-3m7 0-3-3m-4-7v5m-1 0h2"></path>
+                                    </svg>
+                                    Nutrition
+                                </button>
+                                <button class="tab" data-tab="benefits">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 22c1.25-1.25 2.5-2.5 3.5-2.5 1.5 0 1.5 2.5 3 2.5s1.5-2.5 3-2.5 1.5 2.5 3 2.5 1.5-2.5 3-2.5 1.5 2.5 3 2.5 1.5-2.5 3-2.5c1 0 2.25 1.25 3.5 2.5"></path>
+                                        <path d="M19.2 16.2c.2-.4.8-.4 1 0l.2.6c.2.2.6.4.8.2l.6-.2c.4-.2.8.2.6.6l-.2.6c-.2.2 0 .6.2.8l.6.2c.4.2.4.8 0 1l-.6.2c-.2.2-.4.6-.2.8l.2.6c.2.4-.2.8-.6.6l-.6-.2c-.2-.2-.6 0-.8.2l-.2.6c-.2.4-.8.4-1 0l-.2-.6c-.2-.2-.6-.4-.8-.2l-.6.2c-.4.2-.8-.2-.6-.6l.2-.6c.2-.2 0-.6-.2-.8l-.6-.2c-.4-.2-.4-.8 0-1l.6-.2c.2-.2.4-.6.2-.8l-.2-.6c-.2-.4.2-.8.6-.6l.6.2c.2.2.6 0 .8-.2l.2-.6Z"></path>
+                                    </svg>
+                                    Benefits
+                                </button>
+                                <button class="tab" data-tab="facts">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 16v-4"></path>
+                                        <path d="M12 8h.01"></path>
+                                    </svg>
+                                    Fun Facts
+                                </button>
+                            </div>
+
+                            <div class="tab-content active" id="nutrition-content">
+                                <div id="nutrition-list" class="info-list">
+                                    <div class="loading-skeleton"></div>
+                                    <div class="loading-skeleton"></div>
+                                    <div class="loading-skeleton"></div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content" id="benefits-content">
+                                <ul id="benefits-list" class="info-list">
+                                    <div class="loading-skeleton"></div>
+                                    <div class="loading-skeleton"></div>
+                                    <div class="loading-skeleton"></div>
+                                </ul>
+                            </div>
+
+                            <div class="tab-content" id="facts-content">
+                                <ul id="facts-list" class="info-list">
+                                    <div class="loading-skeleton"></div>
+                                    <div class="loading-skeleton"></div>
+                                    <div class="loading-skeleton"></div>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="spinner"></div>
+                <p>Recognizing fruit...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Created by Lucky with the help of Google Gemini API</p>
+            <p>Powered by Google Gemini AI</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
